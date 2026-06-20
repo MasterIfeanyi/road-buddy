@@ -12,6 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://road-buddy.netlify.app"),
   title: "Road Trip With Your Buddy",
   description: "A trivia driving game for the June Solstice Game Jam. Drive down the road answering questions on Juneteenth, civil rights history, Alan Turing, and the World Cup before your hearts run out.",
   openGraph: {
@@ -31,7 +32,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Road Trip With Your Buddy",
     description: "A trivia driving game built for the June Solstice Game Jam.",
-    images: ["/logo.png"],
+    images: ["/images/car.png"],
   },
 };
 
