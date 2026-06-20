@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getShuffledQuestions } from '@/data/questions';
 import { getStoredItem, storeItem, clearItems } from '@/lib/storage';
 import Input from "@/components/ui/Input";
@@ -19,15 +19,16 @@ export default function Game() {
     const [showQuestion, setShowQuestion] = useState(false);
     const [answer, setAnswer] = useState('');
     const [gameOver, setGameOver] = useState(false);
+    const engineRef = useRef(null);
 
 
     useEffect(() => {
-    if (gameOver || showQuestion) return;
-    const timer = setTimeout(() => {
-        setShowQuestion(true);
-    }, INTERVAL);
-    return () => clearTimeout(timer);
-}, [gameOver, showQuestion]);
+        if (gameOver || showQuestion) return;
+        const timer = setTimeout(() => {
+            setShowQuestion(true);
+        }, INTERVAL);
+        return () => clearTimeout(timer);
+    }, [gameOver, showQuestion]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -39,6 +40,24 @@ export default function Game() {
         storeItem('hearts', hearts);
         storeItem('score', score);
     }, [hearts, score]);
+
+    useEffect(() => {
+        if (!engineRef.current) return;
+        if (started && !gameOver) {
+            engineRef.current.volume = 0.4;
+            engineRef.current.play().catch(() => { });
+        } else {
+            engineRef.current.pause();
+        }
+    }, [started, gameOver]);
+
+    useEffect(() => {
+        if (gameOver) {
+            const gameOverSound = new Audio('/sounds/game-over.mp3');
+            gameOverSound.volume = 0.6;
+            gameOverSound.play().catch(() => { });
+        }
+    }, [gameOver]);
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -82,6 +101,7 @@ export default function Game() {
 
     return (
         <div className="w-screen h-screen flex justify-center items-center">
+            <audio ref={engineRef} src="/sounds/engine.mp3" loop />
             <div
                 className={`road-scroll ${gameOver ? 'paused grayscale' : ''} relative w-full h-full max-w-[1300px] aspect-video bg-cover bg-center ${gameOver ? 'grayscale' : ''}`}
                 style={{ backgroundImage: "url('/images/road.png')" }}
